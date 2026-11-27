@@ -1,0 +1,19 @@
+[project]
+name = "agent-guardrails-lab"
+version = "0.1.0"
+description = "Guardrails for a tool-using AI agent, tested against a worst-case hijacked agent"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "PIE", "S", "BLE"]
+ignore = ["S101"]  # assert is how pytest tests work
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S"]
+"mutation_check.py" = ["S603"]  # runs pytest on a temp copy
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
