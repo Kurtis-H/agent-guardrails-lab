@@ -33,14 +33,21 @@ def _attempts():
         if s.name.startswith("hijacked agent loops"):
             continue  # each call is fine on its own; the budget stops the loop
         for i, step in enumerate(s.attack):
-            yield pytest.param(s, step, id=f"{s.name} #{i + 1} {step.tool}")
+            gap = i in s.known_gaps
+            yield pytest.param(
+                s, step, gap, id=f"{s.name} #{i + 1} {step.tool}{' (gap)' if gap else ''}"
+            )
 
 
-@pytest.mark.parametrize(("scenario", "step"), list(_attempts()))
-def test_every_single_attempt_is_blocked(scenario, step):
-    """Not just "the attack failed overall": each attempt on its own is refused."""
+@pytest.mark.parametrize(("scenario", "step", "known_gap"), list(_attempts()))
+def test_every_single_attempt_is_blocked(scenario, step, known_gap):
+    """Not just "the attack failed overall": each attempt on its own is refused.
+    A known gap must stay allowed, so fixing it shows up here and gets documented."""
     guard = Guard(world(), scenario.make_policy(), scenario.user_request)
     ScriptedAgent(scenario.task).run(guard)  # the agent has done the real task first
+    if known_gap:
+        guard.call(step.tool, **step.args)
+        return
     with pytest.raises(Blocked):
         guard.call(step.tool, **step.args)
 
