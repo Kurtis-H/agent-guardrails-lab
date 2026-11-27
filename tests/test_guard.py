@@ -215,3 +215,8 @@ def test_untrusted_output_is_tracked_but_trusted_is_not():
     g.call("list_files")
     g.call("read_file", path="a.txt")
     assert g.untrusted_seen == ["hello"]
+
+
+def test_contacts_match_whatever_their_case():
+    g = Guard(world(), policy(contacts={"Boss@Company.Example"}), "Send the usual update")
+    g.call("send_email", to="boss@company.example", subject="update", body="ok")

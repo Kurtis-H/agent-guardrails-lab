@@ -25,7 +25,7 @@ MUTANTS = {
     "lookalike domains allowed": ('host.endswith("." + d)', "host.endswith(d)"),
     "secrets allowed in URLs": ("if leaks(url, self.policy.secrets):", "if False:"),
     "any recipient allowed": (
-        "if to not in self.policy.contacts and to not in self.user_emails:",
+        "if to not in self.contacts and to not in self.user_emails:",
         "if False:",
     ),
     "recipient matched by substring": (

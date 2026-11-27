@@ -100,6 +100,7 @@ class Guard:
     def __init__(self, sandbox: Sandbox, policy: Policy, user_request: str):
         self.sandbox = sandbox
         self.policy = policy
+        self.contacts = {c.strip().lower() for c in policy.contacts}
         self.user_request = user_request
         # Whole addresses and paths the user wrote. Exact matches only:
         # "s@company.example" is inside "boss@company.example" but isn't it.
@@ -174,7 +175,7 @@ class Guard:
         to = to.strip().lower()
         if not _EMAIL.fullmatch(to):
             raise Blocked("email-recipient", f"{to!r} isn't one email address")
-        if to not in self.policy.contacts and to not in self.user_emails:
+        if to not in self.contacts and to not in self.user_emails:
             from_untrusted = any(to in text.lower() for text in self.untrusted_seen)
             reason = (
                 f"{to} came from a page or file, not from the user"
